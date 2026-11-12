@@ -80,8 +80,8 @@ finance-menager-api/
 
 **1. Clone o repositório**
 ```bash
-git clone https://github.com/pedrohnh06/finance-menager-api.git
-cd finance-menager-api
+git clone https://github.com/pedrohnh06/finance-manager-api.git
+cd finance-manager-api
 ```
 
 **2. Crie e ative o Ambiente Virtual (.venv)**
