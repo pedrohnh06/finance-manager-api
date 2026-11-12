@@ -1,5 +1,5 @@
 // Configuração base da API
-const API_URL = "https://finance-menager-api.onrender.com";
+const API_URL = "https://finance-manager-api.onrender.com";
 let currentToken = localStorage.getItem("token") || null;
 let chartCategoriasInstance = null;
 let chartBalancoInstance = null;
@@ -11,7 +11,7 @@ function toggleAuth(type) {
     const loginForm = document.getElementById('login-form');
     const registerForm = document.getElementById('register-form');
     const tabs = document.querySelectorAll('.tab-btn');
-    
+
     document.getElementById('auth-msg').innerText = '';
 
     if (type === 'login') {
@@ -112,7 +112,7 @@ function logout() {
 // ==========================================
 async function fetchWithAuth(url, options = {}) {
     if (!currentToken) return null;
-    
+
     options.headers = {
         ...options.headers,
         "Authorization": `Bearer ${currentToken}`
@@ -186,7 +186,7 @@ async function carregarTransacoes() {
             transacoes.reverse().forEach(t => {
                 const tr = document.createElement('tr');
                 const tipoCor = t.tipo === 'receita' ? '#38a169' : '#e53e3e';
-                
+
                 tr.innerHTML = `
                     <td>${t.descricao}</td>
                     <td style="color: ${tipoCor}; font-weight: 500;">
@@ -210,11 +210,11 @@ async function carregarCategorias() {
         const res = await fetchWithAuth(`${API_URL}/categorias/`);
         if (res.ok) {
             const categorias = await res.json();
-            
+
             // Popula a tabela de categorias
             const tbody = document.getElementById('categories-body');
             tbody.innerHTML = '';
-            
+
             // Popula o select de transações
             const select = document.getElementById('trans-categoria');
             select.innerHTML = '<option value="" disabled selected>Selecione...</option>';
@@ -371,19 +371,19 @@ async function renderizarGraficos() {
     try {
         const resTransacoes = await fetchWithAuth(`${API_URL}/transacoes/${getQueryParams()}`);
         const resCategorias = await fetchWithAuth(`${API_URL}/categorias/`);
-        
+
         if (!resTransacoes.ok || !resCategorias.ok) return;
-        
+
         const transacoes = await resTransacoes.json();
         const categorias = await resCategorias.json();
-        
+
         const mapCategorias = {};
         categorias.forEach(c => mapCategorias[c.id] = c.nome);
-        
+
         let despesasPorCategoria = {};
         let totalReceitas = 0;
         let totalDespesas = 0;
-        
+
         transacoes.forEach(t => {
             if (t.tipo === 'despesa') {
                 totalDespesas += t.valor;
@@ -393,7 +393,7 @@ async function renderizarGraficos() {
                 totalReceitas += t.valor;
             }
         });
-        
+
         // Gráfico de Categorias (Rosca)
         const ctxCat = document.getElementById('chart-categorias').getContext('2d');
         if (chartCategoriasInstance) chartCategoriasInstance.destroy();
@@ -408,7 +408,7 @@ async function renderizarGraficos() {
             },
             options: { responsive: true, maintainAspectRatio: false }
         });
-        
+
         // Gráfico de Balanço (Barras)
         const ctxBal = document.getElementById('chart-balanco').getContext('2d');
         if (chartBalancoInstance) chartBalancoInstance.destroy();
@@ -422,14 +422,14 @@ async function renderizarGraficos() {
                     backgroundColor: ['#38a169', '#e53e3e']
                 }]
             },
-            options: { 
-                responsive: true, 
+            options: {
+                responsive: true,
                 maintainAspectRatio: false,
                 scales: { y: { beginAtZero: true } },
                 plugins: { legend: { display: false } }
             }
         });
-        
+
     } catch (error) {
         console.error(error);
     }
@@ -442,10 +442,10 @@ async function renderizarGraficos() {
 function exportarParaPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    
+
     doc.setFontSize(18);
     doc.text("Relatório de Transações - FinTrack", 14, 20);
-    
+
     doc.autoTable({
         html: '#transactions-table',
         startY: 30,
@@ -456,6 +456,6 @@ function exportarParaPDF() {
             { header: 'Valor', dataKey: 1 }
         ]
     });
-    
+
     doc.save('fintrack-relatorio.pdf');
 }
